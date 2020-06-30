@@ -15,6 +15,7 @@
     "rimraf": "^3.0.2"
   },
   "dependencies": {
+    "enquirer": "^2.3.5",
     "mkdirp": "^1.0.4"
   }
 }

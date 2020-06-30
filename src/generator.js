@@ -7,6 +7,7 @@ const cmake = require('./cmake');
 
 const defaultOptions = {
     root: '.',
+    projectName: 'untitled',
     cmake: '3.0',
     cpp: '14',
 };
@@ -43,5 +44,7 @@ module.exports = {
         };
 
         await createFolderStructure(options);
-    }
+    },
+
+    defaultOptions
 };
