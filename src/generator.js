@@ -3,14 +3,13 @@ const mkdirp = require('mkdirp');
 const {promisify} = require('util');
 const fs = require('fs');
 const writeFile = promisify(fs.writeFile);
+const cmake = require('./cmake');
 
 const defaultOptions = {
-    root: '.'
+    root: '.',
+    cmake: '3.0',
+    cpp: '14',
 };
-
-const srcFolder = 'src';
-const appsFolder = 'apps';
-const libsFolder = 'libs';
 
 const folders = {
     src: 'src',
@@ -33,7 +32,7 @@ const createFolderStructure = async (options) => {
     await mkdirp(paths.tests);
 
     await writeFile(join(paths.project, '.gitignore'), '', 'utf8');
-    await writeFile(join(paths.project, 'CMakeLists.txt'), '', 'utf8');
+    await writeFile(join(paths.project, 'CMakeLists.txt'), cmake.topLevel(options, folders), 'utf8');
 };
 
 module.exports = {
