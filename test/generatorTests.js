@@ -191,4 +191,23 @@ describe('generator tests', () => {
         expect(lines[1]).to.equal('b');
         expect(lines[2]).to.equal('c');
     });
+
+    it('should create the source-level cmake file', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+        });
+
+        await fileExists(output, 'demo', 'src', 'CMakeLists.txt');
+    });
+
+    it('adds the lib folder to cmake', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+        });
+
+        const lines = await readLines(output, 'demo', 'src', 'CMakeLists.txt');
+        expect(lines[0]).to.equal('add_subdirectory(libs)');
+    });
 });
