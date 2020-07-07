@@ -10,6 +10,7 @@ const defaultOptions = {
     projectName: 'untitled',
     cmake: '3.0',
     cpp: '14',
+    gitignore: [],
 };
 
 const folders = {
@@ -32,7 +33,7 @@ const createFolderStructure = async (options) => {
     await mkdirp(paths.libs);
     await mkdirp(paths.tests);
 
-    await writeFile(join(paths.project, '.gitignore'), '', 'utf8');
+    await writeFile(join(paths.project, '.gitignore'), options.gitignore.join('\n'), 'utf8');
     await writeFile(join(paths.project, 'CMakeLists.txt'), cmake.topLevel(options, folders), 'utf8');
 };
 

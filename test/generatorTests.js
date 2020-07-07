@@ -176,4 +176,19 @@ describe('generator tests', () => {
         const lines = await readLines(output, 'demo', 'CMakeLists.txt');
         expect(lines[4]).to.equal('add_subdirectory(src)');
     });
+
+    it('should create gitignore with correct entries', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            gitignore: [
+                'a', 'b', 'c'
+            ]
+        });
+
+        const lines = await readLines(output, 'demo', '.gitignore');
+        expect(lines[0]).to.equal('a');
+        expect(lines[1]).to.equal('b');
+        expect(lines[2]).to.equal('c');
+    });
 });
