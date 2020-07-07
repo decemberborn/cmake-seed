@@ -42,6 +42,7 @@ const createFolderStructure = async (options) => {
     await writeFile(join(paths.project, 'CMakeLists.txt'), cmake.top(), 'utf8');
     await writeFile(join(paths.src, 'CMakeLists.txt'), cmake.src(), 'utf8');
     await writeFile(join(paths.libs, 'CMakeLists.txt'), cmake.libs(), 'utf8');
+    await writeFile(join(paths.apps, 'CMakeLists.txt'), cmake.apps(), 'utf8');
 };
 
 module.exports = {

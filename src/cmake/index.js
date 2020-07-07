@@ -3,5 +3,6 @@ module.exports = (options, folders) => {
         top: () => require('./top')(options, folders),
         src: () => require('./src')(options, folders),
         libs: () => require('./libs')(options, folders),
+        apps: () => require('./apps')(options, folders),
     }
 };

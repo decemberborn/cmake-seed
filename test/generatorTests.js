@@ -215,19 +215,18 @@ describe('generator tests', () => {
         await sut.run({
             root: output,
             projectName: 'demo',
-            libraries: {
-                'kalle': {
-                    deps: [
-                        'pelle'
-                    ]
-                },
-                'pelle': {
-                    deps: []
-                }
-            }
         });
 
         await fileExists(output, 'demo', 'src', 'libs', 'CMakeLists.txt');
+    });
+
+    it('should create a cmake file in the apps folder', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+        });
+
+        await fileExists(output, 'demo', 'src', 'apps', 'CMakeLists.txt');
     });
 
     it('should create a folder for each lib', async () => {
