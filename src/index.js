@@ -90,9 +90,8 @@ async function collectApplications() {
     await prompt({
         type: 'select',
         choices: [ 'Continue' ],
-        message: `Next, I\'ll need to know which applications and libraries
-you want as part of your project. After you\'ve filled
-this out, I\'ll ask for more information to setup linkage`
+        message: `Next, I\'ll need to know which applications and libraries you want as part of your project.
+  After you\'ve filled this out, I\'ll ask for more information to setup linkage`
     });
 
     const applications = await collectApplications();
