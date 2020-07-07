@@ -210,4 +210,43 @@ describe('generator tests', () => {
         const lines = await readLines(output, 'demo', 'src', 'CMakeLists.txt');
         expect(lines[0]).to.equal('add_subdirectory(libs)');
     });
+
+    it('should create a cmake file in the libs folder', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            libraries: {
+                'kalle': {
+                    deps: [
+                        'pelle'
+                    ]
+                },
+                'pelle': {
+                    deps: []
+                }
+            }
+        });
+
+        await fileExists(output, 'demo', 'src', 'libs', 'CMakeLists.txt');
+    });
+
+    it('should create a folder for each lib', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            libraries: {
+                'kalle': {
+                    deps: [
+                        'pelle'
+                    ]
+                },
+                'pelle': {
+                    deps: []
+                }
+            }
+        });
+
+        await folderExists(output, 'demo', 'src', 'libs', 'kalle');
+        await folderExists(output, 'demo', 'src', 'libs', 'pelle');
+    });
 });

@@ -102,6 +102,10 @@ async function collectApplications() {
 
     generator.run({
         ...initialResponse,
-        gitignore
+        gitignore,
+        libraries: libraries.reduce((acc, next) => ({
+            ...acc,
+            [next]: {}
+        }), {})
     });
 })();

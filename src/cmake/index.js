@@ -1,6 +1,7 @@
 module.exports = (options, folders) => {
     return {
-        topLevel: () => require('./topLevel')(options, folders),
-        srcLevel: () => require('./srcLevel')(options, folders),
+        top: () => require('./top')(options, folders),
+        src: () => require('./src')(options, folders),
+        libs: () => require('./libs')(options, folders),
     }
 };
