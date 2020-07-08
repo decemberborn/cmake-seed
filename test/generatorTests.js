@@ -234,18 +234,26 @@ describe('generator tests', () => {
             root: output,
             projectName: 'demo',
             libraries: {
-                'kalle': {
-                    deps: [
-                        'pelle'
-                    ]
-                },
-                'pelle': {
-                    deps: []
-                }
+                'kalle': {},
+                'pelle': {}
             }
         });
 
         await folderExists(output, 'demo', 'src', 'libs', 'kalle');
         await folderExists(output, 'demo', 'src', 'libs', 'pelle');
+    });
+
+    it('should create a folder for each app', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            applications: {
+                'kalle': {},
+                'pelle': {}
+            }
+        });
+
+        await folderExists(output, 'demo', 'src', 'apps', 'kalle');
+        await folderExists(output, 'demo', 'src', 'apps', 'pelle');
     });
 });

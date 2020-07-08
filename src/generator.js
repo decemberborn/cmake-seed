@@ -37,6 +37,10 @@ const createFolderStructure = async (options) => {
     const libNames = Object.keys(options.libraries || {});
     await Promise.all(libNames.map(entry => mkdirp(join(paths.libs, entry))));
 
+    // Create app folders
+    const appNames = Object.keys(options.applications || {});
+    await Promise.all(appNames.map(entry => mkdirp(join(paths.apps, entry))));
+
     const cmake = cmakeGen(options, folders);
     await writeFile(join(paths.project, '.gitignore'), options.gitignore.join('\n'), 'utf8');
     await writeFile(join(paths.project, 'CMakeLists.txt'), cmake.top(), 'utf8');

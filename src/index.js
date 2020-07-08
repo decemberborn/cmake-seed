@@ -104,8 +104,10 @@ async function collectApplications() {
         ...initialResponse,
         gitignore,
         libraries: libraries.reduce((acc, next) => ({
-            ...acc,
-            [next]: {}
+            ...acc, [next]: {}
+        }), {}),
+        applications: applications.reduce((acc, next) => ({
+            ...acc, [next]: {}
         }), {})
     });
 })();
