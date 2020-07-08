@@ -256,4 +256,34 @@ describe('generator tests', () => {
         await folderExists(output, 'demo', 'src', 'apps', 'kalle');
         await folderExists(output, 'demo', 'src', 'apps', 'pelle');
     });
+
+    it('should add the folders for each library item', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            libraries: {
+                'kalle': {},
+                'pelle': {}
+            }
+        });
+
+        const lines = await readLines(output, 'demo', 'src', 'libs', 'CMakeLists.txt');
+        expect(lines[0]).to.equal('add_subdirectory(kalle)');
+        expect(lines[1]).to.equal('add_subdirectory(pelle)');
+    });
+
+    it('should add the folders for each application item', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            applications: {
+                'kalle': {},
+                'pelle': {}
+            }
+        });
+
+        const lines = await readLines(output, 'demo', 'src', 'apps', 'CMakeLists.txt');
+        expect(lines[0]).to.equal('add_subdirectory(kalle)');
+        expect(lines[1]).to.equal('add_subdirectory(pelle)');
+    });
 });

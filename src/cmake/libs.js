@@ -1,3 +1,2 @@
-module.exports = (config, folders) => {
-    return ``;
-};
+const subdirList = require('./subdirList');
+module.exports = config => subdirList(config.libraries);
