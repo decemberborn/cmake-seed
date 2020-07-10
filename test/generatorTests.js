@@ -360,4 +360,19 @@ describe('generator tests', () => {
         const cmake = cmakeGen({}, {}, { appEntryPoint: 'main.cpp' });
         expect(content).to.equal(cmake.app('kalle'));
     });
+
+    it('should add a cmake file for each library', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            libraries: {
+                'kalle': {},
+                'pelle': {}
+            }
+        });
+
+
+        await fileExists(output, 'demo', 'src', 'libs', 'kalle', 'CMakeLists.txt');
+        await fileExists(output, 'demo', 'src', 'libs', 'pelle', 'CMakeLists.txt');
+    });
 });
