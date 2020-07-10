@@ -8,6 +8,7 @@ const lstat = promisify(fs.lstat);
 const output = 'test-output';
 const path = require('path');
 const readFile = promisify(fs.readFile);
+const cpp = require('../src/cpp');
 
 const getFsEntry = async (...dirs) => {
     const fullPath = path.join(...dirs);
@@ -285,5 +286,52 @@ describe('generator tests', () => {
         const lines = await readLines(output, 'demo', 'src', 'apps', 'CMakeLists.txt');
         expect(lines[0]).to.equal('add_subdirectory(kalle)');
         expect(lines[1]).to.equal('add_subdirectory(pelle)');
+    });
+
+    it('should add a cmake file for each application', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            applications: {
+                'kalle': {},
+                'pelle': {}
+            }
+        });
+
+
+        await fileExists(output, 'demo', 'src', 'apps', 'kalle', 'CMakeLists.txt');
+        await fileExists(output, 'demo', 'src', 'apps', 'pelle', 'CMakeLists.txt');
+    });
+
+    it('adds a main.cpp to each app', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            applications: {
+                'kalle': {},
+                'pelle': {}
+            }
+        });
+
+
+        await fileExists(output, 'demo', 'src', 'apps', 'kalle', 'main.cpp');
+        await fileExists(output, 'demo', 'src', 'apps', 'pelle', 'main.cpp');
+    });
+
+    it('contains the correct cpp template in applications', async () => {
+        const opt = {
+            root: output,
+            projectName: 'demo',
+            applications: {
+                'kalle': {},
+                'pelle': {}
+            }
+        };
+
+        await sut.run(opt);
+
+        const mainCpp = path.join(output, 'demo', 'src', 'apps', 'kalle', 'main.cpp');
+        const content = await readFile(mainCpp, {encoding: 'utf8'});
+        expect(content).to.equal(cpp.main('kalle'));
     });
 });
