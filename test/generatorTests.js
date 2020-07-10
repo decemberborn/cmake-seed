@@ -9,6 +9,7 @@ const output = 'test-output';
 const path = require('path');
 const readFile = promisify(fs.readFile);
 const cpp = require('../src/cpp');
+const cmakeGen = require('../src/cmake');
 
 const getFsEntry = async (...dirs) => {
     const fullPath = path.join(...dirs);
@@ -212,6 +213,16 @@ describe('generator tests', () => {
         expect(lines[0]).to.equal('add_subdirectory(libs)');
     });
 
+    it('adds the apps folder to cmake', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+        });
+
+        const lines = await readLines(output, 'demo', 'src', 'CMakeLists.txt');
+        expect(lines[1]).to.equal('add_subdirectory(apps)');
+    });
+
     it('should create a cmake file in the libs folder', async () => {
         await sut.run({
             root: output,
@@ -333,5 +344,20 @@ describe('generator tests', () => {
         const mainCpp = path.join(output, 'demo', 'src', 'apps', 'kalle', 'main.cpp');
         const content = await readFile(mainCpp, {encoding: 'utf8'});
         expect(content).to.equal(cpp.main('kalle'));
+    });
+
+    it('should add the main entry point in application cmake files', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            applications: {
+                'kalle': {},
+            }
+        });
+
+        const cmakePath = path.join(output, 'demo', 'src', 'apps', 'kalle', 'CMakeLists.txt');
+        const content = await readFile(cmakePath, {encoding: 'utf8'});
+        const cmake = cmakeGen({}, {}, { appEntryPoint: 'main.cpp' });
+        expect(content).to.equal(cmake.app('kalle'));
     });
 });

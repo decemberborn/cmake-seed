@@ -21,14 +21,18 @@ const folders = {
     tests: 'tests'
 };
 
-const createApps = async (options, paths) => {
+const files = {
+    appEntryPoint: 'main.cpp'
+};
+
+const createApps = async (options, paths, cmake) => {
     const appNames = Object.keys(options.applications || {});
     await Promise.all(appNames.map(async entry => {
         const entryPath = join(paths.apps, entry);
         await mkdirp(entryPath);
         await Promise.all([
-            writeFile(join(entryPath, 'CMakeLists.txt'), '', 'utf8'),
-            writeFile(join(entryPath, 'main.cpp'), cppGen.main(entry), 'utf8'),
+            writeFile(join(entryPath, 'CMakeLists.txt'), cmake.app(entry), 'utf8'),
+            writeFile(join(entryPath, files.appEntryPoint), cppGen.main(entry), 'utf8'),
         ]);
     }));
 };
@@ -46,7 +50,7 @@ const createFolderStructure = async (options) => {
     await mkdirp(paths.libs);
     await mkdirp(paths.tests);
 
-    const cmake = cmakeGen(options, folders);
+    const cmake = cmakeGen(options, folders, files);
 
     // Create library folders
     const libNames = Object.keys(options.libraries || {});
