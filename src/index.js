@@ -2,6 +2,7 @@ const {prompt, NumberPrompt} = require('enquirer');
 const generator = require('./generator');
 const {defaultOptions} = generator;
 const ideSettings = require('./ideSettings');
+const libType = require('./cmake/libType');
 
 async function collect(countQuestion, collectQuestion) {
     console.log();
@@ -23,10 +24,33 @@ async function collect(countQuestion, collectQuestion) {
     }))));
 }
 
-async function collectLibs() {
-    return collect(
+async function collectStaticLibs() {
+    const libs = await collect(
         'How many static libraries do you want?',
         'Name of library');
+
+    return libs.map(lib => ({
+        name: lib,
+        type: libType.static
+    }))
+}
+
+async function collectSharedLibs() {
+    const libs = await collect(
+        'How many shared/dynamic libraries do you want?',
+        'Name of library');
+
+    return libs.map(lib => ({
+        name: lib,
+        type: libType.shared
+    }))
+}
+
+async function collectLibs() {
+    return [
+        ...(await collectStaticLibs()),
+        ...(await collectSharedLibs())
+    ];
 }
 
 async function collectApplications() {
@@ -104,7 +128,7 @@ async function collectApplications() {
         ...initialResponse,
         gitignore,
         libraries: libraries.reduce((acc, next) => ({
-            ...acc, [next]: {}
+            ...acc, [next.name]: { type: next.type }
         }), {}),
         applications: applications.reduce((acc, next) => ({
             ...acc, [next]: {}

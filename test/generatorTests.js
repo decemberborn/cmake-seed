@@ -10,6 +10,7 @@ const path = require('path');
 const readFile = promisify(fs.readFile);
 const cpp = require('../src/cpp');
 const cmakeGen = require('../src/cmake');
+const libType = require('../src/cmake/libType');
 
 const getFsEntry = async (...dirs) => {
     const fullPath = path.join(...dirs);
@@ -246,8 +247,12 @@ describe('generator tests', () => {
             root: output,
             projectName: 'demo',
             libraries: {
-                'kalle': {},
-                'pelle': {}
+                'kalle': {
+                    type: libType.static
+                },
+                'pelle': {
+                    type: libType.static
+                }
             }
         });
 
@@ -404,6 +409,23 @@ describe('generator tests', () => {
         const cmakePath = path.join(output, 'demo', 'src', 'libs', 'kalle', 'CMakeLists.txt');
         const content = await readFile(cmakePath, {encoding: 'utf8'});
         const cmake = cmakeGen({}, {}, { libEntryPoint: 'lib.cpp' });
-        expect(content).to.equal(cmake.lib('kalle'));
+        expect(content).to.equal(cmake.lib('kalle', libType.static));
+    });
+
+    it('should be possible to specify shared libs', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            libraries: {
+                'kalle': {
+                    type: libType.shared
+                },
+            }
+        });
+
+        const cmakePath = path.join(output, 'demo', 'src', 'libs', 'kalle', 'CMakeLists.txt');
+        const content = await readFile(cmakePath, {encoding: 'utf8'});
+        const cmake = cmakeGen({}, {}, { libEntryPoint: 'lib.cpp' });
+        expect(content).to.equal(cmake.lib('kalle', libType.shared));
     });
 });

@@ -37,7 +37,7 @@ const createArtifacts = async (artifacts, rootPath, files) => {
 
 const createLibs = async (options, paths, cmake) =>
     createArtifacts(options.libraries, paths.libs, [
-        { name: 'CMakeLists.txt', content: entry => cmake.lib(entry) },
+        { name: 'CMakeLists.txt', content: entry => cmake.lib(entry, options.libraries[entry].type) },
         { name: files.libEntryPoint, content: entry => cppGen.lib(entry) }
     ]);
 
