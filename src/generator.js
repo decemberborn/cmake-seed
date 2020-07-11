@@ -22,7 +22,8 @@ const folders = {
 };
 
 const files = {
-    appEntryPoint: 'main.cpp'
+    appEntryPoint: 'main.cpp',
+    libEntryPoint: 'lib.cpp'
 };
 
 const createArtifacts = async (artifacts, rootPath, files) => {
@@ -34,9 +35,10 @@ const createArtifacts = async (artifacts, rootPath, files) => {
     }));
 };
 
-const createLibs = async (options, paths) =>
+const createLibs = async (options, paths, cmake) =>
     createArtifacts(options.libraries, paths.libs, [
-        { name: 'CMakeLists.txt', content: () => '' }
+        { name: 'CMakeLists.txt', content: entry => cmake.lib(entry) },
+        { name: files.libEntryPoint, content: entry => cppGen.lib(entry) }
     ]);
 
 const createApps = async (options, paths, cmake) =>

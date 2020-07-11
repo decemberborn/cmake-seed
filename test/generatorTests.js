@@ -375,4 +375,35 @@ describe('generator tests', () => {
         await fileExists(output, 'demo', 'src', 'libs', 'kalle', 'CMakeLists.txt');
         await fileExists(output, 'demo', 'src', 'libs', 'pelle', 'CMakeLists.txt');
     });
+
+    it('contains the correct cpp template in libraries', async () => {
+        const opt = {
+            root: output,
+            projectName: 'demo',
+            libraries: {
+                'kalle': {},
+            }
+        };
+
+        await sut.run(opt);
+
+        const libCpp = path.join(output, 'demo', 'src', 'libs', 'kalle', 'lib.cpp');
+        const content = await readFile(libCpp, {encoding: 'utf8'});
+        expect(content).to.equal(cpp.lib('kalle'));
+    });
+
+    it('should add the main entry point in library cmake files', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            libraries: {
+                'kalle': {},
+            }
+        });
+
+        const cmakePath = path.join(output, 'demo', 'src', 'libs', 'kalle', 'CMakeLists.txt');
+        const content = await readFile(cmakePath, {encoding: 'utf8'});
+        const cmake = cmakeGen({}, {}, { libEntryPoint: 'lib.cpp' });
+        expect(content).to.equal(cmake.lib('kalle'));
+    });
 });
