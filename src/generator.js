@@ -25,28 +25,25 @@ const files = {
     appEntryPoint: 'main.cpp'
 };
 
-const createLibs = async (options, paths, cmake) => {
-    const libNames = Object.keys(options.libraries || {});
-    await Promise.all(libNames.map(async entry => {
-        const entryPath = join(paths.libs, entry);
+const createArtifacts = async (artifacts, rootPath, files) => {
+    const names = Object.keys(artifacts || {});
+    await Promise.all(names.map(async entry => {
+        const entryPath = join(rootPath, entry);
         await mkdirp(entryPath);
-        await Promise.all([
-            writeFile(join(entryPath, 'CMakeLists.txt'), '', 'utf8')
-        ]);
+        await Promise.all(files.map(f => writeFile(join(entryPath, f.name), f.content(entry), 'utf8')));
     }));
 };
 
-const createApps = async (options, paths, cmake) => {
-    const appNames = Object.keys(options.applications || {});
-    await Promise.all(appNames.map(async entry => {
-        const entryPath = join(paths.apps, entry);
-        await mkdirp(entryPath);
-        await Promise.all([
-            writeFile(join(entryPath, 'CMakeLists.txt'), cmake.app(entry), 'utf8'),
-            writeFile(join(entryPath, files.appEntryPoint), cppGen.main(entry), 'utf8'),
-        ]);
-    }));
-};
+const createLibs = async (options, paths) =>
+    createArtifacts(options.libraries, paths.libs, [
+        { name: 'CMakeLists.txt', content: () => '' }
+    ]);
+
+const createApps = async (options, paths, cmake) =>
+    createArtifacts(options.applications, paths.apps, [
+        { name: 'CMakeLists.txt', content: entry => cmake.app(entry) },
+        { name: files.appEntryPoint, content: entry => cppGen.main(entry) }
+    ]);
 
 const createFolderStructure = async (options) => {
     const paths = {
@@ -63,8 +60,10 @@ const createFolderStructure = async (options) => {
 
     const cmake = cmakeGen(options, folders, files);
 
-    await createLibs(options, paths, cmake);
-    await createApps(options, paths, cmake);
+    await Promise.all([
+        createLibs(options, paths, cmake),
+        createApps(options, paths, cmake)
+    ]);
 
     await writeFile(join(paths.project, '.gitignore'), options.gitignore.join('\n'), 'utf8');
     await writeFile(join(paths.project, 'CMakeLists.txt'), cmake.top(), 'utf8');
