@@ -1,8 +1,9 @@
 const libType = require('./libType');
-const libName = type => type === libType.shared ? 'SHARED' : 'STATIC';
+const libTypeName = type => type === libType.shared ? 'SHARED' : 'STATIC';
 
-module.exports = ({name, files, libType}) => `add_library(
-    ${name} ${libName(libType)}
-    ${files.libEntryPoint}
+module.exports = ({name, options: { libraries }, files}) => `add_library(
+    ${name} ${libTypeName(libraries[name].type)}
+    ${files.libEntryPoint.impl}
+    ${files.libEntryPoint.header}
 )
 `;

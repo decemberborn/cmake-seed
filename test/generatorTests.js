@@ -4,38 +4,13 @@ const fs = require('fs');
 const {promisify} = require('util');
 const mkdir = promisify(fs.mkdir);
 const rimraf = promisify(require('rimraf'));
-const lstat = promisify(fs.lstat);
 const output = 'test-output';
 const path = require('path');
 const readFile = promisify(fs.readFile);
 const cpp = require('../src/cpp');
 const cmakeGen = require('../src/cmake');
 const libType = require('../src/cmake/libType');
-
-const getFsEntry = async (...dirs) => {
-    const fullPath = path.join(...dirs);
-
-    try {
-        return lstat(fullPath);
-    } catch(_) {
-        return null;
-    }
-};
-
-const folderExists = async (...entries) => {
-    const entry = await getFsEntry(...entries);
-    return entry && entry.isDirectory();
-};
-
-const fileExists = async (...entries) => {
-    const entry = await getFsEntry(...entries);
-    return entry && entry.isFile();
-};
-
-const readLines = async (...entries) => {
-    const content = await readFile(path.join(...entries), {encoding: 'utf8'});
-    return content.split('\n');
-};
+const {folderExists, fileExists, readLines} = require('./helpers');
 
 describe('generator tests', () => {
     beforeEach(async () => {
@@ -352,17 +327,19 @@ describe('generator tests', () => {
     });
 
     it('should add the main entry point in application cmake files', async () => {
-        await sut.run({
+        const opt = {
             root: output,
             projectName: 'demo',
             applications: {
                 'kalle': {},
             }
-        });
+        };
+
+        await sut.run(opt);
 
         const cmakePath = path.join(output, 'demo', 'src', 'apps', 'kalle', 'CMakeLists.txt');
         const content = await readFile(cmakePath, {encoding: 'utf8'});
-        const cmake = cmakeGen({}, {}, { appEntryPoint: 'main.cpp' });
+        const cmake = cmakeGen(opt, {}, { appEntryPoint: 'main.cpp' });
         expect(content).to.equal(cmake.app('kalle'));
     });
 
@@ -381,7 +358,7 @@ describe('generator tests', () => {
         await fileExists(output, 'demo', 'src', 'libs', 'pelle', 'CMakeLists.txt');
     });
 
-    it('contains the correct cpp template in libraries', async () => {
+    it('contains the correct cpp impl in libraries', async () => {
         const opt = {
             root: output,
             projectName: 'demo',
@@ -394,26 +371,46 @@ describe('generator tests', () => {
 
         const libCpp = path.join(output, 'demo', 'src', 'libs', 'kalle', 'lib.cpp');
         const content = await readFile(libCpp, {encoding: 'utf8'});
-        expect(content).to.equal(cpp.lib('kalle'));
+        expect(content).to.equal(cpp.lib.impl('kalle'));
     });
 
-    it('should add the main entry point in library cmake files', async () => {
-        await sut.run({
+    it('contains the correct cpp header in libraries', async () => {
+        const opt = {
             root: output,
             projectName: 'demo',
             libraries: {
                 'kalle': {},
             }
-        });
+        };
+
+        await sut.run(opt);
+
+        const libCpp = path.join(output, 'demo', 'src', 'libs', 'kalle', 'lib.cpp');
+        const content = await readFile(libCpp, {encoding: 'utf8'});
+        expect(content).to.equal(cpp.lib.header('kalle'));
+    });
+
+    it('should add the main entry point in library cmake files', async () => {
+        const opt = {
+            root: output,
+            projectName: 'demo',
+            libraries: {
+                'kalle': {
+                    type: libType.static
+                },
+            }
+        };
+
+        await sut.run(opt);
 
         const cmakePath = path.join(output, 'demo', 'src', 'libs', 'kalle', 'CMakeLists.txt');
         const content = await readFile(cmakePath, {encoding: 'utf8'});
-        const cmake = cmakeGen({}, {}, { libEntryPoint: 'lib.cpp' });
-        expect(content).to.equal(cmake.lib('kalle', libType.static));
+        const cmake = cmakeGen(opt, {}, { libEntryPoint: { impl: 'lib.cpp', header: 'lib.h' } });
+        expect(content).to.equal(cmake.lib('kalle'));
     });
 
     it('should be possible to specify shared libs', async () => {
-        await sut.run({
+        const opt = {
             root: output,
             projectName: 'demo',
             libraries: {
@@ -421,11 +418,13 @@ describe('generator tests', () => {
                     type: libType.shared
                 },
             }
-        });
+        };
+
+        await sut.run(opt);
 
         const cmakePath = path.join(output, 'demo', 'src', 'libs', 'kalle', 'CMakeLists.txt');
         const content = await readFile(cmakePath, {encoding: 'utf8'});
-        const cmake = cmakeGen({}, {}, { libEntryPoint: 'lib.cpp' });
-        expect(content).to.equal(cmake.lib('kalle', libType.shared));
+        const cmake = cmakeGen(opt, {}, { libEntryPoint: { impl: 'lib.cpp', header: 'lib.h'} });
+        expect(content).to.equal(cmake.lib('kalle'));
     });
 });

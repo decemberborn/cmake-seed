@@ -9,7 +9,13 @@ int main(int argc, char *argv[]) {
 `;
     },
 
-    lib: libName => {
-        return `// todo for ${libName}`
+    lib: {
+        impl: libName => {
+            return `// todo for ${libName}`
+        },
+
+        header: libName => {
+            return `// todo for ${libName}`
+        }
     }
 };

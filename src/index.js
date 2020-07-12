@@ -53,6 +53,30 @@ async function collectLibs() {
     ];
 }
 
+async function appDependencies(apps, libs) {
+    console.log();
+
+    const collected = [];
+
+    for (const name of apps) {
+        const result = await prompt(
+            {
+                type: 'multiselect',
+                name: 'dependencies',
+                choices: libs.map(l => l.name),
+                message: `Which libraries is the application '${name}' dependent on? Select by pressing space.`
+            }
+        );
+
+        collected.push({
+            name,
+            dependencies: result.dependencies
+        });
+    }
+
+    return collected;
+}
+
 async function collectApplications() {
     return collect(
         'How many executable applications do you want?',
@@ -121,8 +145,10 @@ async function collectApplications() {
     const applications = await collectApplications();
     const libraries = await collectLibs();
 
-    console.log(applications);
-    console.log(libraries);
+    const depApps = await appDependencies(applications, libraries);
+
+    console.log(depApps);
+    // console.log(libraries);
 
     generator.run({
         ...initialResponse,
@@ -130,8 +156,8 @@ async function collectApplications() {
         libraries: libraries.reduce((acc, next) => ({
             ...acc, [next.name]: { type: next.type }
         }), {}),
-        applications: applications.reduce((acc, next) => ({
-            ...acc, [next]: {}
+        applications: depApps.reduce((acc, next) => ({
+            ...acc, [next.name]: { dependencies: next.dependencies  }
         }), {})
     });
 })();
