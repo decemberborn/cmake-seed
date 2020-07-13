@@ -11,7 +11,7 @@ const cpp = require('../src/cpp');
 const cmakeGen = require('../src/cmake');
 const libType = require('../src/cmake/libType');
 const {folderExists, fileExists, readLines} = require('./helpers');
-const testType = require('../src/testType');
+const testType = require('../src/testConfig/testType');
 
 describe('generator tests', () => {
     let sut;

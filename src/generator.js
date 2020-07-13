@@ -5,7 +5,7 @@ const fs = require('fs');
 const writeFile = promisify(fs.writeFile);
 const cmakeGen = require('./cmake');
 const cppGen = require('./cpp');
-const testType = require('./testType');
+const testType = require('./testConfig/testType');
 
 const defaultOptions = {
     root: '.',
