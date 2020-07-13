@@ -5,6 +5,7 @@ const fs = require('fs');
 const writeFile = promisify(fs.writeFile);
 const cmakeGen = require('./cmake');
 const cppGen = require('./cpp');
+const testType = require('./testType');
 
 const defaultOptions = {
     root: '.',
@@ -51,7 +52,7 @@ const createApps = async (options, paths, cmake, cpp) =>
         { name: files.appEntryPoint, content: entry => cpp.main(entry) }
     ]);
 
-const createFolderStructure = async (options) => {
+const createFolderStructure = async (options, services) => {
     const paths = {
         project: join(options.root, options.projectName),
         get src() { return join(this.project, folders.src); },
@@ -60,12 +61,16 @@ const createFolderStructure = async (options) => {
         get tests() { return join(this.src, folders.tests); },
     };
 
+    options.tests = options.tests || testType.none;
+
     await mkdirp(paths.apps);
     await mkdirp(paths.libs);
 
     if (options.tests) {
         await mkdirp(paths.tests);
     }
+
+    await services.testConfig(options.tests);
 
     const cmake = cmakeGen(options, folders, files);
     const cpp = cppGen(options, files);
@@ -83,13 +88,17 @@ const createFolderStructure = async (options) => {
 };
 
 module.exports = {
-    async run(opt) {
-        const options = {
-            ...defaultOptions,
-            ...opt
-        };
+    generator(services) {
+        return {
+            async run(opt) {
+                const options = {
+                    ...defaultOptions,
+                    ...opt
+                };
 
-        await createFolderStructure(options);
+                await createFolderStructure(options, services);
+            }
+        }
     },
 
     defaultOptions

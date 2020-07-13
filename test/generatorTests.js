@@ -1,5 +1,5 @@
 const {expect} = require('chai');
-const sut = require('../src/generator');
+const {generator} = require('../src/generator');
 const fs = require('fs');
 const {promisify} = require('util');
 const mkdir = promisify(fs.mkdir);
@@ -14,7 +14,19 @@ const {folderExists, fileExists, readLines} = require('./helpers');
 const testType = require('../src/testType');
 
 describe('generator tests', () => {
+    let sut;
+    let serviceMock;
+
     beforeEach(async () => {
+        serviceMock = {
+            testConfigCalls: [],
+
+            testConfig(type) {
+                return Promise.resolve(this.testConfigCalls.push(type))
+            }
+        };
+
+        sut = generator(serviceMock);
         await rimraf(output);
         await mkdir(output);
     });
@@ -93,6 +105,26 @@ describe('generator tests', () => {
         expect(await folderExists(output, 'demo', 'src', 'tests')).to.be.false;
     });
 
+    it('configures tests', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            tests: testType.none
+        });
+
+        expect(serviceMock.testConfigCalls.length).to.equal(1);
+        expect(serviceMock.testConfigCalls[0]).to.equal(testType.none);
+    });
+
+    it('assumes no tests if none specified', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo'
+        });
+
+        expect(serviceMock.testConfigCalls.length).to.equal(1);
+        expect(serviceMock.testConfigCalls[0]).to.equal(testType.none);
+    });
 
     it('should set the version as the first line in top-level cmake', async () => {
         await sut.run({

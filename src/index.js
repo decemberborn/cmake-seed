@@ -1,6 +1,5 @@
 const {prompt, NumberPrompt} = require('enquirer');
-const generator = require('./generator');
-const {defaultOptions} = generator;
+const {generator, defaultOptions} = require('./generator');
 const ideSettings = require('./ideSettings');
 const libType = require('./cmake/libType');
 
@@ -150,7 +149,11 @@ async function collectApplications() {
     console.log(depApps);
     // console.log(libraries);
 
-    generator.run({
+    const services = {
+        testConfig: require('./testConfig')
+    };
+
+    generator(services).run({
         ...initialResponse,
         gitignore,
         libraries: libraries.reduce((acc, next) => ({
