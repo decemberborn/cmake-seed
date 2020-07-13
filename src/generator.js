@@ -38,17 +38,17 @@ const createArtifacts = async (artifacts, rootPath, files) => {
     }));
 };
 
-const createLibs = async (options, paths, cmake) =>
+const createLibs = async (options, paths, cmake, cpp) =>
     createArtifacts(options.libraries, paths.libs, [
         { name: 'CMakeLists.txt', content: entry => cmake.lib(entry, options.libraries[entry].type) },
-        { name: files.libEntryPoint.impl, content: entry => cppGen.lib.impl(entry) },
-        { name: files.libEntryPoint.header, content: entry => cppGen.lib.header(entry) }
+        { name: files.libEntryPoint.impl, content: entry => cpp.lib.impl(entry) },
+        { name: files.libEntryPoint.header, content: entry => cpp.lib.header(entry) }
     ]);
 
-const createApps = async (options, paths, cmake) =>
+const createApps = async (options, paths, cmake, cpp) =>
     createArtifacts(options.applications, paths.apps, [
         { name: 'CMakeLists.txt', content: entry => cmake.app(entry) },
-        { name: files.appEntryPoint, content: entry => cppGen.main(entry) }
+        { name: files.appEntryPoint, content: entry => cpp.main(entry) }
     ]);
 
 const createFolderStructure = async (options) => {
@@ -65,10 +65,11 @@ const createFolderStructure = async (options) => {
     await mkdirp(paths.tests);
 
     const cmake = cmakeGen(options, folders, files);
+    const cpp = cppGen(options, files);
 
     await Promise.all([
-        createLibs(options, paths, cmake),
-        createApps(options, paths, cmake)
+        createLibs(options, paths, cmake, cpp),
+        createApps(options, paths, cmake, cpp)
     ]);
 
     await writeFile(join(paths.project, '.gitignore'), options.gitignore.join('\n'), 'utf8');

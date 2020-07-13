@@ -323,7 +323,7 @@ describe('generator tests', () => {
 
         const mainCpp = path.join(output, 'demo', 'src', 'apps', 'kalle', 'main.cpp');
         const content = await readFile(mainCpp, {encoding: 'utf8'});
-        expect(content).to.equal(cpp.main('kalle'));
+        expect(content).to.equal(cpp(opt, { libEntryPoint: {} }).main('kalle'));
     });
 
     it('should add the main entry point in application cmake files', async () => {
@@ -371,7 +371,7 @@ describe('generator tests', () => {
 
         const libCpp = path.join(output, 'demo', 'src', 'libs', 'kalle', 'lib.cpp');
         const content = await readFile(libCpp, {encoding: 'utf8'});
-        expect(content).to.equal(cpp.lib.impl('kalle'));
+        expect(content).to.equal(cpp().lib.impl('kalle'));
     });
 
     it('contains the correct cpp header in libraries', async () => {
@@ -387,7 +387,7 @@ describe('generator tests', () => {
 
         const libCpp = path.join(output, 'demo', 'src', 'libs', 'kalle', 'lib.h');
         const content = await readFile(libCpp, {encoding: 'utf8'});
-        expect(content).to.equal(cpp.lib.header('kalle'));
+        expect(content).to.equal(cpp().lib.header('kalle'));
     });
 
     it('should add the main entry point in library cmake files', async () => {
