@@ -62,7 +62,10 @@ const createFolderStructure = async (options) => {
 
     await mkdirp(paths.apps);
     await mkdirp(paths.libs);
-    await mkdirp(paths.tests);
+
+    if (options.tests) {
+        await mkdirp(paths.tests);
+    }
 
     const cmake = cmakeGen(options, folders, files);
     const cpp = cppGen(options, files);

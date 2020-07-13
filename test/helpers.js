@@ -8,7 +8,7 @@ const getFsEntry = async (...dirs) => {
     const fullPath = path.join(...dirs);
 
     try {
-        return lstat(fullPath);
+        return await lstat(fullPath);
     } catch(_) {
         return null;
     }
@@ -17,12 +17,12 @@ const getFsEntry = async (...dirs) => {
 module.exports = {
     folderExists: async (...entries) => {
         const entry = await getFsEntry(...entries);
-        return entry && entry.isDirectory();
+        return !!(entry && entry.isDirectory());
     },
 
     fileExists: async (...entries) => {
         const entry = await getFsEntry(...entries);
-        return entry && entry.isFile();
+        return !!(entry && entry.isFile());
     },
 
     readLines: async (...entries) => {

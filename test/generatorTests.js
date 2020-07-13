@@ -11,6 +11,7 @@ const cpp = require('../src/cpp');
 const cmakeGen = require('../src/cmake');
 const libType = require('../src/cmake/libType');
 const {folderExists, fileExists, readLines} = require('./helpers');
+const testType = require('../src/testType');
 
 describe('generator tests', () => {
     beforeEach(async () => {
@@ -72,14 +73,26 @@ describe('generator tests', () => {
         expect(await folderExists(output, 'demo', 'src', 'libs')).to.be.true;
     });
 
-    it('should create a src/tests folder', async () => {
+    it('should create a src/tests folder if tests are specified', async () => {
         await sut.run({
             root: output,
-            projectName: 'demo'
+            projectName: 'demo',
+            tests: testType.gtest
         });
 
         expect(await folderExists(output, 'demo', 'src', 'tests')).to.be.true;
     });
+
+    it('should NOT create a src/tests folder if no tests are specified', async () => {
+        await sut.run({
+            root: output,
+            projectName: 'demo',
+            tests: testType.none
+        });
+
+        expect(await folderExists(output, 'demo', 'src', 'tests')).to.be.false;
+    });
+
 
     it('should set the version as the first line in top-level cmake', async () => {
         await sut.run({
