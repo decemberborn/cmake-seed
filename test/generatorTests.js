@@ -385,7 +385,7 @@ describe('generator tests', () => {
 
         await sut.run(opt);
 
-        const libCpp = path.join(output, 'demo', 'src', 'libs', 'kalle', 'lib.cpp');
+        const libCpp = path.join(output, 'demo', 'src', 'libs', 'kalle', 'lib.h');
         const content = await readFile(libCpp, {encoding: 'utf8'});
         expect(content).to.equal(cpp.lib.header('kalle'));
     });

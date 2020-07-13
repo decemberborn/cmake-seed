@@ -1,7 +1,6 @@
 module.exports = {
     main: appName => {
         return `#include <iostream>
-
 int main(int argc, char *argv[]) {
     std::cout << "Hello from '${appName}'" << std::endl;
     return 0;
@@ -10,12 +9,20 @@ int main(int argc, char *argv[]) {
     },
 
     lib: {
-        impl: libName => {
-            return `// todo for ${libName}`
+        header: libName => {
+            return `namespace ${libName} {
+    void hello();
+}`
         },
 
-        header: libName => {
-            return `// todo for ${libName}`
+        impl: libName => {
+            return `#include "lib.h"
+#include <iostream>
+
+// ${libName} entry point
+void ${libName}::hello_world() {
+    std::cout << ${libName} << std::endl;
+}`
         }
     }
 };
