@@ -21,8 +21,14 @@ describe('generator tests', () => {
         serviceMock = {
             testConfigCalls: [],
 
-            testConfig(type) {
-                return Promise.resolve(this.testConfigCalls.push(type))
+            testMock: {
+                initCalls: [],
+                init(...args) { this.initCalls.push([...args]) }
+            },
+
+            testConfig(...args) {
+                this.testConfigCalls.push([...args]);
+                return this.testMock;
             }
         };
 
@@ -112,8 +118,7 @@ describe('generator tests', () => {
             tests: testType.none
         });
 
-        expect(serviceMock.testConfigCalls.length).to.equal(1);
-        expect(serviceMock.testConfigCalls[0]).to.equal(testType.none);
+        expect(serviceMock.testMock.initCalls.length).to.equal(1);
     });
 
     it('assumes no tests if none specified', async () => {
@@ -123,7 +128,8 @@ describe('generator tests', () => {
         });
 
         expect(serviceMock.testConfigCalls.length).to.equal(1);
-        expect(serviceMock.testConfigCalls[0]).to.equal(testType.none);
+        const args = serviceMock.testConfigCalls[0];
+        expect(args[0]).to.equal(testType.none);
     });
 
     it('should set the version as the first line in top-level cmake', async () => {
