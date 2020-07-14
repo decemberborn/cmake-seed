@@ -70,7 +70,7 @@ const createFolderStructure = async (options, services) => {
         await mkdirp(paths.tests);
     }
 
-    await services.testConfig(options.tests);
+    await services.testConfig(options.tests, { paths });
 
     const cmake = cmakeGen(options, folders, files);
     const cpp = cppGen(options, files);

@@ -2,9 +2,9 @@ const testType = require('./testType');
 
 const configs = {
     [testType.none]: () => {},
-    [testType.gtest]: () => {}
+    [testType.gtest]: require('./gtestConfig')
 };
 
-module.exports = type => {
-    return configs[type]();
+module.exports = (type, options) => {
+    return configs[type](options);
 };

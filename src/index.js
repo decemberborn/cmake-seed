@@ -2,6 +2,7 @@ const {prompt, NumberPrompt} = require('enquirer');
 const {generator, defaultOptions} = require('./generator');
 const ideSettings = require('./ideSettings');
 const libType = require('./cmake/libType');
+const testType = require('./testConfig/testType');
 
 async function collect(countQuestion, collectQuestion) {
     console.log();
@@ -161,6 +162,7 @@ async function collectApplications() {
         }), {}),
         applications: depApps.reduce((acc, next) => ({
             ...acc, [next.name]: { dependencies: next.dependencies  }
-        }), {})
+        }), {}),
+        tests: testType.gtest
     });
 })();

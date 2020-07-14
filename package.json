@@ -15,7 +15,9 @@
     "rimraf": "^3.0.2"
   },
   "dependencies": {
+    "adm-zip": "^0.4.16",
     "enquirer": "^2.3.5",
-    "mkdirp": "^1.0.4"
+    "mkdirp": "^1.0.4",
+    "node-fetch": "^2.6.0"
   }
 }
