@@ -55,23 +55,25 @@ async function collectLibs() {
 
 async function appDependencies(apps, libs) {
     console.log();
-
     const collected = [];
+    const choices = libs.map(l => l.name);
 
-    for (const name of apps) {
-        const result = await prompt(
-            {
-                type: 'multiselect',
-                name: 'dependencies',
-                choices: libs.map(l => l.name),
-                message: `Which libraries is the application '${name}' dependent on? Select by pressing space.`
-            }
-        );
+    if (choices.length !== 0) {
+        for (const name of apps) {
+            const result = await prompt(
+                {
+                    type: 'multiselect',
+                    name: 'dependencies',
+                    choices,
+                    message: `Which libraries is the application '${name}' dependent on? Select by pressing space.`
+                }
+            );
 
-        collected.push({
-            name,
-            dependencies: result.dependencies
-        });
+            collected.push({
+                name,
+                dependencies: result.dependencies
+            });
+        }
     }
 
     return collected;
