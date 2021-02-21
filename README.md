@@ -40,3 +40,7 @@ Either open and build the project from CLion (if you selected that option), or f
 $ mkdir build && cd build # or whatever you selected your output folder to be
 $ cmake ..   
 ```
+
+## Contributing
+
+Feel free to open issues, contribute through PRs etc.
