@@ -1,3 +1,5 @@
+![tests](https://github.com/decemberborn/cmake-seed/actions/workflows/node.js.yml/badge.svg)
+
 # cmake-seed
 
 Stub a CMake-based project with X number of executables, Y number of static libs and Z number of dynamic libs.
