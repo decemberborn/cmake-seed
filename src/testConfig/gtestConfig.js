@@ -6,13 +6,14 @@ const pipeline = promisify(require('stream').pipeline);
 const AdmZip = require('adm-zip');
 const mkdirp = require('mkdirp');
 const path = require('path');
+const writeFile = promisify(fs.writeFile);
 
-module.exports = ({paths}) => ({
+module.exports = ({paths, cmake, cpp}) => ({
     async init() {
         console.log('fetching gtest');
         const url = 'https://github.com/google/googletest/archive/v1.10.x.zip';
         const result = await fetch(url);
-        const extPath = path.join(paths.project, 'external');
+        const extPath = paths.external;
         await mkdirp(extPath);
         const zipPath = path.join(extPath, 'googletest.zip');
         await pipeline(result.body, fs.createWriteStream(zipPath));
@@ -28,6 +29,9 @@ module.exports = ({paths}) => ({
 
         await rimraf(newPath);
         await promisify(fs.unlink)(zipPath);
-        return promisify(fs.rename)(oldPath, newPath);
+        await promisify(fs.rename)(oldPath, newPath);
+
+        await writeFile(path.join(paths.tests, 'CMakeLists.txt'), cmake.gtest(), 'utf8');
+        await writeFile(path.join(paths.tests, 'my_test.cpp'), cpp.gtest(), 'utf8');
     }
 });

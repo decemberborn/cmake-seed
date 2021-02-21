@@ -147,9 +147,6 @@ async function collectApplications() {
 
     const depApps = await appDependencies(applications, libraries);
 
-    console.log(depApps);
-    // console.log(libraries);
-
     const services = {
         testConfig: require('./testConfig')
     };

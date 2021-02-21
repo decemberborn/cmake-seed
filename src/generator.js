@@ -17,6 +17,7 @@ const defaultOptions = {
 
 const folders = {
     src: 'src',
+    external: 'external',
     apps: 'apps',
     libs: 'libs',
     tests: 'tests'
@@ -55,6 +56,7 @@ const createApps = async (options, paths, cmake, cpp) =>
 const createFolderStructure = async (options, services) => {
     const paths = {
         project: join(options.root, options.projectName),
+        get external() { return join(this.project, folders.external); },
         get src() { return join(this.project, folders.src); },
         get apps() { return join(this.src, folders.apps); },
         get libs() { return join(this.src, folders.libs); },
@@ -70,11 +72,10 @@ const createFolderStructure = async (options, services) => {
         await mkdirp(paths.tests);
     }
 
-    const testConfig = services.testConfig(options.tests, { paths });
-    await testConfig.init();
-
     const cmake = cmakeGen(options, folders, files);
     const cpp = cppGen(options, files);
+    const testConfig = services.testConfig(options.tests, { paths, cmake, cpp });
+    await testConfig.init();
 
     await Promise.all([
         createLibs(options, paths, cmake, cpp),

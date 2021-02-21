@@ -5,6 +5,7 @@ module.exports = (options, folders, files) => {
         libs: () => require('./libs')(options, folders),
         apps: () => require('./apps')(options),
         app: name => require('./app')({ name, options, folders, files}),
-        lib: name => require('./lib')({ name, options, folders, files})
+        lib: name => require('./lib')({ name, options, folders, files}),
+        gtest: () => require('./gtest')({ options, folders, files})
     }
 };
