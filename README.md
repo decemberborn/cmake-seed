@@ -41,6 +41,9 @@ $ mkdir build && cd build # or whatever you selected your output folder to be
 $ cmake ..   
 ```
 
+After building, you should be able to run your app in `./build/src/apps/my-app/my-app` (adjusting the name of your app, of course).
+Test suite can be run by the executable `./build/src/tests/tests`
+
 ## Contributing
 
 Feel free to open issues, contribute through PRs etc.
